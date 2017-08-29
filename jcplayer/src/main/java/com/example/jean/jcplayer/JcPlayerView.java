@@ -21,23 +21,68 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JcPlayerView extends LinearLayout implements
-        View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+        JcPlayerService.JcPlayerServiceListener,
+        View.OnClickListener, SeekBar.OnSeekBarChangeListener, JcPlayerService.OnInvalidPathListener{
 
     private static final String TAG = JcPlayerView.class.getSimpleName();
 
     private static final int PULSE_ANIMATION_DURATION = 200;
     private static final int TITLE_ANIMATION_DURATION = 600;
-
-    private TextView txtCurrentMusic;
-    private ImageButton btnPrev;
-    private ImageButton btnPlay;
-    private ProgressBar progressBarPlayer;
     private JcAudioPlayer jcAudioPlayer;
-    private TextView txtDuration;
-    private ImageButton btnNext;
-    private SeekBar seekBar;
-    private TextView txtCurrentDuration;
+    private TextView rest_time, start_time, song_name, song_singer_name;
+    private ImageButton picture_song, image_plus, backward_image,
+            play_image, forward_image, image_repeat, image_shuffle;
+    private SeekBar seek_bar_song, seekbar_volume;
+
+
+    private void init() {
+        inflate(getContext(), R.layout.view_jcplayer, this);
+        this.rest_time = (TextView) findViewById(R.id.rest_time);
+        this.start_time = (TextView) findViewById(R.id.start_time);
+        this.song_name = (TextView) findViewById(R.id.song_name);
+        this.song_singer_name = (TextView) findViewById(R.id.song_singer_name);
+
+        this.picture_song = (ImageButton) findViewById(R.id.picture_song);
+        this.image_plus = (ImageButton) findViewById(R.id.image_plus);
+        this.backward_image = (ImageButton) findViewById(R.id.backward_image);
+        this.play_image = (ImageButton) findViewById(R.id.play_image);
+        this.forward_image = (ImageButton) findViewById(R.id.forward_image);
+        this.image_repeat = (ImageButton) findViewById(R.id.image_repeat);
+        this.image_shuffle = (ImageButton) findViewById(R.id.image_shuffle);
+        this.seek_bar_song = (SeekBar) findViewById(R.id.seek_bar_song);
+        this.seekbar_volume = (SeekBar) findViewById(R.id.seekbar_volume);
+
+        forward_image.setOnClickListener(this);
+        backward_image.setOnClickListener(this);
+        play_image.setOnClickListener(this);
+        seek_bar_song.setOnSeekBarChangeListener(this);
+//
+//        this.progressBarPlayer = (ProgressBar) findViewById(R.id.progress_bar_player);
+//        this.btnNext = (ImageButton) findViewById(R.id.btn_next);
+//        this.btnPrev = (ImageButton) findViewById(R.id.btn_prev);
+//        this.btnPlay = (ImageButton) findViewById(R.id.btn_play);
+//        this.txtDuration = (TextView) findViewById(R.id.txt_total_duration);
+//        this.txtCurrentDuration = (TextView) findViewById(R.id.txt_current_duration);
+//        this.txtCurrentMusic = (TextView) findViewById(R.id.txt_current_music);
+//        this.seekBar = (SeekBar) findViewById(R.id.seek_bar);
+//        this.btnPlay.setTag(R.drawable.ic_play_black);
+//
+//        btnNext.setOnClickListener(this);
+//        btnPrev.setOnClickListener(this);
+//        btnPlay.setOnClickListener(this);
+//        seekBar.setOnSeekBarChangeListener(this);
+    }
+
+//    private TextView txtCurrentMusic;
+//    private ImageButton btnPlay, btnPrev;
+//    private ProgressBar progressBarPlayer;
+
+//    private TextView txtDuration;
+//    private ImageButton btnNext;
+//    private SeekBar seekBar;
+//    private TextView txtCurrentDuration;
     private boolean isInitialized;
+
 
     private OnInvalidPathListener onInvalidPathListener = new OnInvalidPathListener() {
         @Override
@@ -63,12 +108,12 @@ public class JcPlayerView extends LinearLayout implements
                             // Seconds
                             (second < 10 ? "0" + second : second + "");
 
-            seekBar.setMax(duration);
+            seek_bar_song.setMax(duration);
 
-            txtDuration.post(new Runnable() {
+            rest_time.post(new Runnable() {
                 @Override
                 public void run() {
-                    txtDuration.setText(sDuration);
+                    rest_time.setText(sDuration);
                 }
             });
         }
@@ -87,13 +132,13 @@ public class JcPlayerView extends LinearLayout implements
         @Override
         public void onPaused() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                btnPlay.setBackground(ResourcesCompat.getDrawable(getResources(),
+                play_image.setBackground(ResourcesCompat.getDrawable(getResources(),
                         R.drawable.ic_play_black, null));
             } else {
-                btnPlay.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(),
+                play_image.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(),
                         R.drawable.ic_play_black, null));
             }
-            btnPlay.setTag(R.drawable.ic_play_black);
+            play_image.setTag(R.drawable.ic_play_black);
         }
 
         @Override
@@ -104,13 +149,13 @@ public class JcPlayerView extends LinearLayout implements
         @Override
         public void onPlaying() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                btnPlay.setBackground(ResourcesCompat.getDrawable(getResources(),
+                play_image.setBackground(ResourcesCompat.getDrawable(getResources(),
                         R.drawable.ic_pause_black, null));
             } else {
-                btnPlay.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(),
+                play_image.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(),
                         R.drawable.ic_pause_black, null));
             }
-            btnPlay.setTag(R.drawable.ic_pause_black);
+            play_image.setTag(R.drawable.ic_pause_black);
         }
 
         @Override
@@ -121,11 +166,11 @@ public class JcPlayerView extends LinearLayout implements
             final String sMinutes = minutes < 10 ? "0" + minutes : minutes + "";
             final String sSeconds = seconds < 10 ? "0" + seconds : seconds + "";
 
-            seekBar.setProgress((int) currentPosition);
-            txtCurrentDuration.post(new Runnable() {
+            seek_bar_song.setProgress((int) currentPosition);
+            start_time.post(new Runnable() {
                 @Override
                 public void run() {
-                    txtCurrentDuration.setText(String.valueOf(sMinutes + ":" + sSeconds));
+                    start_time.setText(String.valueOf(sMinutes + ":" + sSeconds));
                 }
             });
         }
@@ -136,16 +181,56 @@ public class JcPlayerView extends LinearLayout implements
 
             YoYo.with(Techniques.FadeInLeft)
                     .duration(TITLE_ANIMATION_DURATION)
-                    .playOn(txtCurrentMusic);
+                    .playOn(song_name);
 
-            txtCurrentMusic.post(new Runnable() {
+            song_name.post(new Runnable() {
                 @Override
                 public void run() {
-                    txtCurrentMusic.setText(title);
+                    song_name.setText(title);
                 }
             });
         }
     };
+
+    @Override
+    public void onPreparedAudio(String audioName, int duration) {
+
+    }
+
+    @Override
+    public void onCompletedAudio() {
+
+    }
+
+    @Override
+    public void onPaused() {
+
+    }
+
+    @Override
+    public void onContinueAudio() {
+
+    }
+
+    @Override
+    public void onPlaying() {
+
+    }
+
+    @Override
+    public void onTimeChanged(long currentTime) {
+
+    }
+
+    @Override
+    public void updateTitle(String title) {
+
+    }
+
+    @Override
+    public void onPathError(JcAudio jcAudio) {
+
+    }
 
     //JcPlayerViewStatusListener jcPlayerViewStatusListener = new JcPlayerViewStatusListener() {
     //
@@ -180,20 +265,31 @@ public class JcPlayerView extends LinearLayout implements
 
     public interface JcPlayerViewStatusListener {
         void onPausedStatus(JcStatus jcStatus);
+
         void onContinueAudioStatus(JcStatus jcStatus);
+
         void onPlayingStatus(JcStatus jcStatus);
+
         void onTimeChangedStatus(JcStatus jcStatus);
+
         void onCompletedAudioStatus(JcStatus jcStatus);
+
         void onPreparedAudioStatus(JcStatus jcStatus);
     }
 
-    public interface JcPlayerViewServiceListener {
+    public interface JcPlayerViewServiceListener extends JcPlayerService.JcPlayerServiceListener {
         void onPreparedAudio(String audioName, int duration);
+
         void onCompletedAudio();
+
         void onPaused();
+
         void onContinueAudio();
+
         void onPlaying();
+
         void onTimeChanged(long currentTime);
+
         void updateTitle(String title);
     }
 
@@ -212,24 +308,6 @@ public class JcPlayerView extends LinearLayout implements
         super(context, attrs, defStyle);
     }
 
-    private void init() {
-        inflate(getContext(), R.layout.view_jcplayer, this);
-
-        this.progressBarPlayer = (ProgressBar) findViewById(R.id.progress_bar_player);
-        this.btnNext = (ImageButton) findViewById(R.id.btn_next);
-        this.btnPrev = (ImageButton) findViewById(R.id.btn_prev);
-        this.btnPlay = (ImageButton) findViewById(R.id.btn_play);
-        this.txtDuration = (TextView) findViewById(R.id.txt_total_duration);
-        this.txtCurrentDuration = (TextView) findViewById(R.id.txt_current_duration);
-        this.txtCurrentMusic = (TextView) findViewById(R.id.txt_current_music);
-        this.seekBar = (SeekBar) findViewById(R.id.seek_bar);
-        this.btnPlay.setTag(R.drawable.ic_play_black);
-
-        btnNext.setOnClickListener(this);
-        btnPrev.setOnClickListener(this);
-        btnPlay.setOnClickListener(this);
-        seekBar.setOnSeekBarChangeListener(this);
-    }
 
     /**
      * Initialize the playlist and controls.
@@ -281,6 +359,7 @@ public class JcPlayerView extends LinearLayout implements
     //TODO: Should we expose this to user?
     // A: Yes, because the user can add files to playlist without creating a new List of JcAudio
     // objects, just adding this files dynamically.
+
     /**
      * Add an audio for the playlist. We can track the JcAudio by
      * its id. So here we returning its id after adding to list.
@@ -315,7 +394,7 @@ public class JcPlayerView extends LinearLayout implements
                 if (playlist.size() > 1) {
                     // play next audio when currently played audio is removed.
                     if (jcAudioPlayer.isPlaying()) {
-                        if(jcAudioPlayer.getCurrentAudio().equals(jcAudio)) {
+                        if (jcAudioPlayer.getCurrentAudio().equals(jcAudio)) {
                             playlist.remove(jcAudio);
                             pause();
                             resetPlayerInfo();
@@ -350,7 +429,7 @@ public class JcPlayerView extends LinearLayout implements
     }
 
     public void next() {
-        if(jcAudioPlayer.getCurrentAudio() == null) {
+        if (jcAudioPlayer.getCurrentAudio() == null) {
             return;
         }
         resetPlayerInfo();
@@ -394,29 +473,29 @@ public class JcPlayerView extends LinearLayout implements
     @Override
     public void onClick(View view) {
         if (isInitialized) {
-            if (view.getId() == R.id.btn_play) {
+            if (view.getId() == R.id.play_image) {
                 YoYo.with(Techniques.Pulse)
                         .duration(PULSE_ANIMATION_DURATION)
-                        .playOn(btnPlay);
+                        .playOn(play_image);
 
-                if (btnPlay.getTag().equals(R.drawable.ic_pause_black)) {
+                if (play_image.getTag().equals(R.drawable.ic_pause_black)) {
                     pause();
                 } else {
                     continueAudio();
                 }
             }
         }
-        if (view.getId() == R.id.btn_next) {
+        if (view.getId() == R.id.forward_image) {
             YoYo.with(Techniques.Pulse)
                     .duration(PULSE_ANIMATION_DURATION)
-                    .playOn(btnNext);
+                    .playOn(forward_image);
             next();
         }
 
-        if (view.getId() == R.id.btn_prev) {
+        if (view.getId() == R.id.backward_image) {
             YoYo.with(Techniques.Pulse)
                     .duration(PULSE_ANIMATION_DURATION)
-                    .playOn(btnPrev);
+                    .playOn(backward_image);
             previous();
         }
     }
@@ -454,7 +533,7 @@ public class JcPlayerView extends LinearLayout implements
     }
 
     public boolean isPaused() {
-        return  jcAudioPlayer.isPaused();
+        return jcAudioPlayer.isPaused();
     }
 
     public JcAudio getCurrentAudio() {
@@ -511,38 +590,38 @@ public class JcPlayerView extends LinearLayout implements
     }
 
     private void showProgressBar() {
-        progressBarPlayer.setVisibility(ProgressBar.VISIBLE);
-        btnPlay.setVisibility(Button.GONE);
-        btnNext.setClickable(false);
-        btnPrev.setClickable(false);
+        seek_bar_song.setVisibility(ProgressBar.VISIBLE);
+        play_image.setVisibility(Button.GONE);
+        forward_image.setClickable(false);
+        backward_image.setClickable(false);
     }
 
     private void dismissProgressBar() {
-        progressBarPlayer.setVisibility(ProgressBar.GONE);
-        btnPlay.setVisibility(Button.VISIBLE);
-        btnNext.setClickable(true);
-        btnPrev.setClickable(true);
+        seek_bar_song.setVisibility(ProgressBar.GONE);
+        play_image.setVisibility(Button.VISIBLE);
+        forward_image.setClickable(true);
+        backward_image.setClickable(true);
     }
 
     private void resetPlayerInfo() {
-        seekBar.setProgress(0);
-        txtCurrentMusic.setText("");
-        txtCurrentDuration.setText(getContext().getString(R.string.play_initial_time));
-        txtDuration.setText(getContext().getString(R.string.play_initial_time));
+        seek_bar_song.setProgress(0);
+        song_name.setText("");
+        start_time.setText(getContext().getString(R.string.play_initial_time));
+        rest_time.setText(getContext().getString(R.string.play_initial_time));
     }
 
     @Override
-    public void onProgressChanged(SeekBar seekBar, int i, boolean fromUser) {
-        if(fromUser && jcAudioPlayer != null) jcAudioPlayer.seekTo(i);
+    public void onProgressChanged(SeekBar seek_bar_song, int i, boolean fromUser) {
+        if (fromUser && jcAudioPlayer != null) jcAudioPlayer.seekTo(i);
     }
 
     @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {
+    public void onStartTrackingTouch(SeekBar seek_bar_song) {
         showProgressBar();
     }
 
     @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
+    public void onStopTrackingTouch(SeekBar seek_bar_song) {
         dismissProgressBar();
     }
 

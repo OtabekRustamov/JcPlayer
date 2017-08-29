@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#f44336</color>
+    <color name="colorPrimaryDark">#e53935</color>
+    <color name="colorAccent">#fff</color>
+
+    <color name="colorDark">#747476</color>
+    <color name="signInStatusbar">#617784</color>
+
+    <color name="colorSmallTransparent">#45000000</color>
+    <color name="back">#000</color>
+    <color name="imageBackground">#e9736f6f</color>
+    <color name="imageTranspaernt">#960000</color>
 </resources>

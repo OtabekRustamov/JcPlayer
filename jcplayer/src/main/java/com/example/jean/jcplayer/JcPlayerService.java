@@ -47,6 +47,19 @@ public class JcPlayerService extends Service implements
         }
     }
 
+    public interface JcPlayerServiceListener {
+        void onPreparedAudio(String audioName, int duration);
+        void onCompletedAudio();
+        void onPaused();
+        void onContinueAudio();
+        void onPlaying();
+        void onTimeChanged(long currentTime);
+        void updateTitle(String title);
+    }
+
+    public interface OnInvalidPathListener {
+        void onPathError(JcAudio jcAudio);
+    }
     public void registerNotificationListener(JcPlayerView.JcPlayerViewServiceListener notificationListener) {
         this.notificationListener = notificationListener;
     }
@@ -371,26 +384,15 @@ public class JcPlayerService extends Service implements
         this.currentTime = mediaPlayer.getCurrentPosition();
         updateTimeAudio();
 
-        if (jcPlayerServiceListeners != null) {
-            for (JcPlayerView.JcPlayerViewServiceListener jcPlayerServiceListener : jcPlayerServiceListeners) {
+        if(jcPlayerServiceListeners != null)
+            for(JcPlayerServiceListener jcPlayerServiceListener : jcPlayerServiceListeners) {
                 jcPlayerServiceListener.updateTitle(currentJcAudio.getTitle());
                 jcPlayerServiceListener.onPreparedAudio(currentJcAudio.getTitle(), mediaPlayer.getDuration());
             }
-        }
 
-        if (notificationListener != null) {
+        if(notificationListener != null) {
             notificationListener.updateTitle(currentJcAudio.getTitle());
             notificationListener.onPreparedAudio(currentJcAudio.getTitle(), mediaPlayer.getDuration());
-        }
-
-        if (jcPlayerStatusListeners != null) {
-            for (JcPlayerView.JcPlayerViewStatusListener jcPlayerViewStatusListener : jcPlayerStatusListeners) {
-                jcStatus.setJcAudio(currentJcAudio);
-                jcStatus.setPlayState(JcStatus.PlayState.PLAY);
-                jcStatus.setDuration(duration);
-                jcStatus.setCurrentPosition(currentTime);
-                jcPlayerViewStatusListener.onPreparedAudioStatus(jcStatus);
-            }
         }
     }
 
