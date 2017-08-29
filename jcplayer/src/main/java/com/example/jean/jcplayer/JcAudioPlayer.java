@@ -6,14 +6,13 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
+import com.example.jean.jcplayer.JcAudio;
 import com.example.jean.jcplayer.JcPlayerExceptions.AudioListNullPointerException;
+import com.example.jean.jcplayer.JcPlayerService;
+import com.example.jean.jcplayer.JcPlayerView;
 
 import java.io.Serializable;
 import java.util.List;
-
-/**
- * Created by jean on 12/07/16.
- */
 
 class JcAudioPlayer {
     private JcPlayerService jcPlayerService;
@@ -211,6 +210,7 @@ class JcAudioPlayer {
             }
             mBound = true;
         }
+
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {

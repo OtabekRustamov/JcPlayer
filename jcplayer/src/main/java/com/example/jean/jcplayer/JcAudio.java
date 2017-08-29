@@ -2,11 +2,9 @@ package com.example.jean.jcplayer;
 
 import android.support.annotation.RawRes;
 
-import java.io.Serializable;
+import com.example.jean.jcplayer.Origin;
 
-/**
- * Created by jean on 27/06/16.
- */
+import java.io.Serializable;
 
 public class JcAudio implements Serializable {
     private long id;

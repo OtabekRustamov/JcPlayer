@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer-array name="rightOpportunityDrawables">
+        <item>@drawable/ic_file_download_black_24dp</item>
+    </integer-array>
+
+    <integer-array name="rightOpportunityColors">
+        <item>@color/colorDark</item>
+    </integer-array>
+
+    <integer-array name="rightOpportunityDrawableColors">
+        <item>@android:color/white</item>
+    </integer-array>
+
+</resources>
